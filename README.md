@@ -1,4 +1,8 @@
-# Installing
+# Installing latest stable version
+
+pip install au-skema
+
+# Installing development version
 pip install -r requirements.txt
 
 # Using this thing
