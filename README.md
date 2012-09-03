@@ -1,7 +1,18 @@
+# Installing
+pip install -r requirements.txt
+
 # Using this thing
 
-Make sure to change this line, so your own student number is used:
+python skema.py weeknumber studentnumber
 
-```python
-data = {'aarskort': 'KO87148', 'B1': 'S%F8g'}
-```
+or:
+
+save your studentnumber in ~/.au-skema and run
+
+python skema.py weeknumber
+
+or:
+
+get current week with studentnumber saved
+
+python skema.py
