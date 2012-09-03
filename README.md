@@ -1,24 +1,31 @@
 # Installing latest stable version
 
+```bash
 pip install au-skema
+```
 
 # Installing development version
-pip install -r requirements.txt
+
+```bash
+python setup.py develop
+```
 
 # Using this thing
 
-```python skema.py weeknumber studentnumber```
+```bash
+skema weeknumber studentnumber
+```
 
-or:
+or save your studentnumber in ~/.au-skema and run:
 
-save your studentnumber in ~/.au-skema and run
+```bash
+skema weeknumber
+```
 
-```python skema.py weeknumber```
+or get current week with studentnumber saved:
 
-or:
-
-get current week with studentnumber saved
-
-```python skema.py```
+```bash
+skema
+```
 
 ![](http://c.kristian.io/image/2C1V2H0P0k19/Screen%20Shot%202012-08-21%20at%2016.52.07.png)
