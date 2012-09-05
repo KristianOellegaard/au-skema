@@ -29,6 +29,7 @@ class Schema(object):
         d = pq(r.text)
 
         classes = []
+        time_slots = []
 
         for subject in d("h3"):
             obj = d(subject).next()
@@ -44,9 +45,15 @@ class Schema(object):
                         week_from, week_to = weeks.text().replace("uge ", "").split("-")
                         classes.append(SchemaEntry(subject=Subject(subject.text), day=day.text(), hours=hours.text(),
                             week_from=int(week_from), week_to=int(week_to), location=location.text(), type=type))
+                        if hours.text().split(" - ")[0] not in time_slots:
+                            time_slots.append(int(hours.text().split(" - ")[0]))
+                        if hours.text().split(" - ")[1] not in time_slots:
+                            time_slots.append(int(hours.text().split(" - ")[1]))
                 obj = obj.next()
 
         self.entries = [c for c in classes if c.week_from <= week_number <= c.week_to]
+        time_slots = sorted(time_slots, key=lambda c: int(c))
+        self.time_slots = range(time_slots[0], time_slots[-1])
 
     def weekly_schedule(self):
         schedule = {}
@@ -65,6 +72,8 @@ class SchemaEntry(object):
         self.subject = subject
         self.day = day
         self.hours = hours
+        self.start_time = int(hours.split(" - ")[0])
+        self.end_time = int(hours.split(" - ")[1])
         self.week_from = week_from
         self.week_to = week_to
         self.location = location
@@ -98,15 +107,27 @@ def main():
         print "Please provide a student number as arg 2 or put it in ~/.au-skema"
         exit(1)
 
-    s = Schema(week_number=week_number, student_number=student_number).weekly_schedule()
-
+    s = Schema(week_number=week_number, student_number=student_number)
+    ws = s.weekly_schedule()
 
     print "=== Uge", week_number, "-",student_number, "==="
-    for day in Schema.days:
-        print day
-        for entry in s[day]:
-            print "     ", entry.hours, entry.subject.name
-            print "         ", entry.location
+    #for day in Schema.days:
+    #    print day
+    #    for entry in ws[day]:
+    #        print "     ", entry.hours, entry.subject.name
+    #        print "         ", entry.location
+
+    from prettytable import PrettyTable
+
+    x = PrettyTable(['Time'] + Schema.days)
+    for time_slot in s.time_slots:
+        classes_by_hour = []
+        for day in Schema.days:
+            class_list = [se.subject.name for se in ws[day] if se.start_time == time_slot or se.start_time < time_slot < se.end_time ] or ['']
+            classes_by_hour.append(class_list[0])
+        x.add_row(["%s-%s" % (time_slot, time_slot+1)] + classes_by_hour)
+    print x
+
 
 
 if __name__ == "__main__":
