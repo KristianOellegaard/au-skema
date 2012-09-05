@@ -28,4 +28,4 @@ or get current week with studentnumber saved:
 skema
 ```
 
-![](http://c.kristian.io/image/2C1V2H0P0k19/Screen%20Shot%202012-08-21%20at%2016.52.07.png)
+![](http://f.cl.ly/items/2Z1f0D3P113a3l2z2P2x/Screen%20Shot%202012-09-05%20at%2012.43.05.png)
