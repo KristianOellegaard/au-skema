@@ -42,7 +42,11 @@ class Schema(object):
                 if obj.is_("table"):
                     for row in obj.find("tr"):
                         team, day, hours, location, weeks, none = [pq(x) for x in pq(row).find("td")]
-                        week_from, week_to = weeks.text().replace("uge ", "").split("-")
+                        week_text = weeks.text().replace("uge ", "")
+                        if len(weeks.text().split("-")) == 2:
+                            week_from, week_to = week_text.split("-")
+                        else:
+                            week_from = week_to = week_text
                         classes.append(SchemaEntry(subject=Subject(subject.text), day=day.text(), hours=hours.text(),
                             week_from=int(week_from), week_to=int(week_to), location=location.text(), type=type))
                         if hours.text().split(" - ")[0] not in time_slots:
@@ -78,6 +82,9 @@ class SchemaEntry(object):
         self.week_to = week_to
         self.location = location
         self.type = type
+
+    def __unicode__(self):
+        return "%s\n%s\n%s" % (self.subject.name, "\n".join(self.location.split(",")), "\n".join(wrap(self.type, 20)))
 
 
 #    classes.append({'subject': subject.text, 'day': day.text(), 'hours': hours.text(),
@@ -123,8 +130,8 @@ def main():
     for time_slot in s.time_slots:
         classes_by_hour = []
         for day in Schema.days:
-            class_list = [se.subject.name for se in ws[day] if se.start_time == time_slot or se.start_time < time_slot < se.end_time ] or ['']
-            classes_by_hour.append(class_list[0])
+            class_list = [se.__unicode__() for se in ws[day] if se.start_time == time_slot or se.start_time < time_slot < se.end_time ] or ['']
+            classes_by_hour.append(class_list[0] + "\n")
         x.add_row(["%s-%s" % (time_slot, time_slot+1)] + classes_by_hour)
     print x
 
