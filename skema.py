@@ -5,6 +5,7 @@ from pyquery import PyQuery as pq
 import sys
 import datetime
 import os
+from textwrap import wrap
 
 class Subject(object):
 
