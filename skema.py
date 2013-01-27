@@ -8,6 +8,25 @@ import datetime
 import os
 import argparse
 from textwrap import wrap
+import json
+
+class SchemaEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, SchemaEntry):
+            return { 
+                'subject': obj.subject,
+                'day': obj.day,
+                'hours': obj.hours,
+                'start_time': obj.start_time,
+                'end_time': obj.end_time,
+                'week_from': obj.week_from,
+                'week_to': obj.week_to,
+                'location': obj.location,
+                'type': obj.type
+            }
+        if isinstance(obj, Subject):
+            return obj.name
+        return json.JSONEncoder.default(self, obj)
 
 class Subject(object):
 
@@ -88,13 +107,10 @@ class SchemaEntry(object):
     def __unicode__(self):
         return "%s\n%s\n%s" % (self.subject.name, "\n".join(self.location.split(",")), "\n".join(wrap(self.type, 20)))
 
-def main(week_number, student_number):
-    s = Schema(week_number=week_number, student_number=student_number)
-    ws = s.weekly_schedule()
 
-    print "=== Uge", week_number, "-",student_number, "==="
+def get_table_from_schema(s):
     from prettytable import PrettyTable
-
+    ws = s.weekly_schedule()
     x = PrettyTable(['Time'] + Schema.days)
     for time_slot in s.time_slots:
         classes_by_hour = []
@@ -102,9 +118,22 @@ def main(week_number, student_number):
             class_list = [se.__unicode__() for se in ws[day] if se.start_time == time_slot or se.start_time < time_slot < se.end_time ] or ['']
             classes_by_hour.append(class_list[0] + "\n")
         x.add_row(["%s-%s" % (time_slot, time_slot+1)] + classes_by_hour)
-    print x
+    return x
+
+def plain_format(s, w, n):
+    header = "=== Uge " + str(w) + " - " + str(n) + " ===\n"
+    return header + get_table_from_schema(s).__str__()
+
+def json_format(s, w, n):
+    ws = s.weekly_schedule()
+    return json.dumps(ws, cls=SchemaEncoder)
+
+def html_format(s, w, n):
+    return get_table_from_schema(s).get_html_string()
 
 if __name__ == "__main__":
+    formats = { 'plain': plain_format, 'html': html_format, 'json': json_format }
+
     parser = argparse.ArgumentParser(
         epilog="""If you get tired of writing your student number all the time,
                   this can be saved in ~/.au-skema. The number from this file
@@ -115,6 +144,11 @@ if __name__ == "__main__":
     parser.add_argument('student', nargs='?',
                         default=int(open(os.path.join(os.environ['HOME'], ".au-skema")).read().replace("\n", "")),
                         help='your student number')
+    parser.add_argument('-f', '--format', default=formats['plain'], choices=formats.keys(),
+                        help='the output format to use')
 
     args = parser.parse_args()
-    main(args.week, args.student)
+
+    schema = Schema(week_number=args.week, student_number=args.student)
+    formatter = formats[args.format]
+    print formatter(schema, args.week, args.student)
