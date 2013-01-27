@@ -131,7 +131,7 @@ def json_format(s, w, n):
 def html_format(s, w, n):
     return get_table_from_schema(s).get_html_string()
 
-if __name__ == "__main__":
+def main():
     formats = { 'plain': plain_format, 'html': html_format, 'json': json_format }
 
     parser = argparse.ArgumentParser(
@@ -152,3 +152,7 @@ if __name__ == "__main__":
     schema = Schema(week_number=args.week, student_number=args.student)
     formatter = formats[args.format]
     print formatter(schema, args.week, args.student)
+
+if __name__ == "__main__":
+    main()
+    
