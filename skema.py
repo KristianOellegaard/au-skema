@@ -144,7 +144,7 @@ def main():
     parser.add_argument('student', nargs='?',
                         default=int(open(os.path.join(os.environ['HOME'], ".au-skema")).read().replace("\n", "")),
                         help='your student number')
-    parser.add_argument('-f', '--format', default=formats['plain'], choices=formats.keys(),
+    parser.add_argument('-f', '--format', default='plain', choices=formats.keys(),
                         help='the output format to use')
 
     args = parser.parse_args()
