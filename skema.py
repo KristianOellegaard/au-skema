@@ -5,6 +5,7 @@ from pyquery import PyQuery as pq
 import sys
 import datetime
 import os
+import argparse
 from textwrap import wrap
 
 class Subject(object):
@@ -91,30 +92,7 @@ class SchemaEntry(object):
 #    classes.append({'subject': subject.text, 'day': day.text(), 'hours': hours.text(),
 #                    'week_from': int(week_from), 'week_to': int(week_to), 'location': location.text(), 'type': type})
 
-def main():
-    try:
-        week_number = int(sys.argv[1])
-    except IndexError:
-        week_number = datetime.date.today().isocalendar()[1]
-    except Exception:
-        week_number = None
-        print "Please provide a week number, e.g. %s (the current week)" % datetime.date.today().isocalendar()[1]
-        exit(1)
-
-    try:
-        student_number = sys.argv[2]
-    except IndexError:
-        try:
-            student_number = open(os.path.join(os.environ['HOME'], ".au-skema")).read().replace("\n", "")
-        except IOError, e:
-            student_number = None
-            print "Please provide a student number as arg 2 or put it in ~/.au-skema"
-            exit(1)
-    except Exception:
-        student_number = None
-        print "Please provide a student number as arg 2 or put it in ~/.au-skema"
-        exit(1)
-
+def main(week_number, student_number):
     s = Schema(week_number=week_number, student_number=student_number)
     ws = s.weekly_schedule()
 
@@ -136,7 +114,17 @@ def main():
         x.add_row(["%s-%s" % (time_slot, time_slot+1)] + classes_by_hour)
     print x
 
-
-
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        epilog="""If you get tired of writing your student number all the time,
+                  this can be saved in ~/.au-skema. The number from this file
+                  will be used as the default.""")
+    parser.add_argument('week', type=int, nargs='?',
+                        default=datetime.date.today().isocalendar()[1],
+                        help='week number for which to show the schedule')
+    parser.add_argument('student', nargs='?',
+                        default=int(open(os.path.join(os.environ['HOME'], ".au-skema")).read().replace("\n", "")),
+                        help='your student number')
+
+    args = parser.parse_args()
+    main(args.week, args.student)
