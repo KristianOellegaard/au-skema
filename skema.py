@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
+
 import requests
 from pyquery import PyQuery as pq
 import sys
@@ -71,7 +72,6 @@ class Schema(object):
                 schedule[day].append(c)
         return schedule
 
-
 class SchemaEntry(object):
 
     def __init__(self, subject, day, hours, week_from, week_to, location, type):
@@ -88,21 +88,11 @@ class SchemaEntry(object):
     def __unicode__(self):
         return "%s\n%s\n%s" % (self.subject.name, "\n".join(self.location.split(",")), "\n".join(wrap(self.type, 20)))
 
-
-#    classes.append({'subject': subject.text, 'day': day.text(), 'hours': hours.text(),
-#                    'week_from': int(week_from), 'week_to': int(week_to), 'location': location.text(), 'type': type})
-
 def main(week_number, student_number):
     s = Schema(week_number=week_number, student_number=student_number)
     ws = s.weekly_schedule()
 
     print "=== Uge", week_number, "-",student_number, "==="
-    #for day in Schema.days:
-    #    print day
-    #    for entry in ws[day]:
-    #        print "     ", entry.hours, entry.subject.name
-    #        print "         ", entry.location
-
     from prettytable import PrettyTable
 
     x = PrettyTable(['Time'] + Schema.days)
