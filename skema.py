@@ -142,7 +142,7 @@ def main():
                         default=datetime.date.today().isocalendar()[1],
                         help='week number for which to show the schedule')
     parser.add_argument('student', nargs='?',
-                        default=int(open(os.path.join(os.environ['HOME'], ".au-skema")).read().replace("\n", "")),
+                        default=open(os.path.join(os.environ['HOME'], ".au-skema")).read().replace("\n", ""),
                         help='your student number')
     parser.add_argument('-f', '--format', default='plain', choices=formats.keys(),
                         help='the output format to use')
