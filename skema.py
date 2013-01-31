@@ -6,9 +6,12 @@ from pyquery import PyQuery as pq
 import sys
 import datetime
 import os
+import os.path
 import argparse
 from textwrap import wrap
 import json
+
+CONFIG_PATH = os.path.join(os.environ['HOME'], ".au-skema")
 
 class SchemaEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -141,9 +144,12 @@ def main():
     parser.add_argument('week', type=int, nargs='?',
                         default=datetime.date.today().isocalendar()[1],
                         help='week number for which to show the schedule')
-    parser.add_argument('student', nargs='?',
-                        default=open(os.path.join(os.environ['HOME'], ".au-skema")).read().replace("\n", ""),
-                        help='your student number')
+
+    default = { 'nargs': 1 } \
+        if not os.path.exists(CONFIG_PATH) \
+        else { 'nargs': '?', 'default': open(CONFIG_PATH).read().replace("\n", "") }
+
+    parser.add_argument('student', help='your student number', **default)
     parser.add_argument('-f', '--format', default='plain', choices=formats.keys(),
                         help='the output format to use')
 
